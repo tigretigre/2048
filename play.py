@@ -4,16 +4,14 @@ from Player import Player
 import strategies
 import sys
 
-# Init player
+
 player = Player()
 
 # Init strategy
-player.strategy = strategies.RandomStrategy()
+player.strategy = strategies.LowerRightStrategy()
 
 def print_status(player):
 	print '\n'.join(map(repr, player._grid))
-	print player._score
-	print '\n'
 
 
 playing = True
@@ -25,6 +23,8 @@ while(playing):
 		moves = raw_input("Move?")
 		if(moves == 'y'):
 			skip = True
+	print player._score
+	print '\n'
 	playing = player.play()
 
 print_status(player)

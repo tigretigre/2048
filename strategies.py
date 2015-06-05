@@ -13,10 +13,10 @@ from moves import (
 MOVE_LIST = [MoveUp, MoveDown, MoveLeft, MoveRight]
 
 ROTATIONS = {
-    MoveUp: lambda x, y: (y, 3 - x),
-    MoveDown: lambda x, y: (y, x),
-    MoveLeft: lambda x, y: (3 - x, y),
-    MoveRight: lambda x, y: (x, y),
+    MoveDown: lambda x, y: (y, 3 - x),
+    MoveUp: lambda x, y: (y, x),
+    MoveRight: lambda x, y: (3 - x, y),
+    MoveLeft: lambda x, y: (x, y),
 }
 
 
@@ -31,6 +31,32 @@ def is_move_valid(grid, move):
     return False    
 
 
+def move_result(grid, move):
+    rot = ROTATIONS[move]
+    score = 0
+    new_grid = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+    for y in range(0, 4):
+        row = []
+        for x in range(0, 4):
+            a, b = rot(x, y)
+            if grid[b][a] > 0:
+                row.append(grid[b][a])
+        smashed = []
+        while row:
+            if len(row) > 1 and row[0] == row[1]:
+                val = 2 * row[0]
+                smashed.append(val)
+                score += val
+                row.pop(0)
+            else:
+                smashed.append(row[0])
+            row.pop(0)
+        for x in range(0, 4):
+            a, b = rot(x, y)
+            new_grid[b][a] = smashed[x] if len(smashed) > x else 0
+    return (new_grid, score)
+
+
 class Strategy(object):
     def registerPlayer(self, player):
         self.player = player
@@ -39,7 +65,7 @@ class Strategy(object):
 class LowerRightStrategy(Strategy):
 
     def getMove(self, grid):
-        mv = next(move for move in [MoveDown, MoveRight, MoveLeft] if is_move_valid(grid, move))
+        mv = next(move for move in [MoveDown, MoveRight, MoveLeft, MoveUp] if is_move_valid(grid, move))
         return mv(self.player)
 
 
