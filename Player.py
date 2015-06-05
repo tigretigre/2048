@@ -8,6 +8,7 @@ class Player(object):
 	def __init__(self):
 		self._start()
 		self._strategy = None
+		self._score = 0
 
 	def play(self):
 		move = self.strategy.getMove(self._grid)
