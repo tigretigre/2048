@@ -14,7 +14,7 @@ grid = [
     [2, 0, 4, 8],
 ]
 
-new_grid, score = strategies.move_result(grid, MoveRight)
+new_grid, score, zeroes = strategies.move_result(grid, MoveRight)
 
 print '\n'.join(map(repr, new_grid))
 print score

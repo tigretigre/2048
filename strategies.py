@@ -35,6 +35,7 @@ def move_result(grid, move):
     rot = ROTATIONS[move]
     score = 0
     new_grid = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+    zeroes = []
     for y in range(0, 4):
         row = []
         for x in range(0, 4):
@@ -53,8 +54,12 @@ def move_result(grid, move):
             row.pop(0)
         for x in range(0, 4):
             a, b = rot(x, y)
-            new_grid[b][a] = smashed[x] if len(smashed) > x else 0
-    return (new_grid, score)
+            if len(smashed) > x:
+                new_grid[b][a] = smashed[x]
+            else:
+                new_grid[b][a] = 0
+                zeroes.append((a, b))
+    return (new_grid, score, zeroes)
 
 
 class Strategy(object):
