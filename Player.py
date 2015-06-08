@@ -5,6 +5,8 @@ import moves
 BASE_URL = 'http://2048.semantics3.com/hi'
 
 class Player(object):
+	_score = 0
+
 	def __init__(self):
 		self._start()
 		self._strategy = None
