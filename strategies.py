@@ -74,6 +74,9 @@ def grid_fanout(grid, zeroes):
         for (p_tile, tile) in [(2, 0.9), (4, 0.1)]
     ]
 
+def dead(grid):
+    return not any(is_move_valid(grid, move) for move in MOVE_LIST)
+
 
 class TreeEvaluator(object):
     def __init__(self, search_depth=2):
@@ -85,7 +88,7 @@ class TreeEvaluator(object):
         if level = self.search_depth:
             return (1, self.leaf_score(grid))
         leaves = []
-        for move in move_list:
+        for move in MOVE_LIST:
             new_grid, score_incr, zeroes = move_result(grid, move)
             for (p_branch, branch_grid) in grid_fanout(new_grid, zeroes):
                 for (p_leaf, leaf_score) in self.eval_tree(branch_grid, level + 1):
