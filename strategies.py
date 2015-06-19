@@ -62,6 +62,36 @@ def move_result(grid, move):
     return (new_grid, score, zeroes)
 
 
+def grid_fanout(grid, zeroes):
+    def add_tile(zero, tile):
+        new_grid = [row[:] for row in grid]
+        x, y = zero
+        new_grid[y][x] = tile
+    p_coords = 1 / len(zeroes)
+    return [
+        (p_coords * p_tile, new_grid(zero, tile))
+        for zero in zeroes
+        for (p_tile, tile) in [(2, 0.9), (4, 0.1)]
+    ]
+
+
+class TreeEvaluator(object):
+    def __init__(self, search_depth=2):
+        self.search_depth
+
+    def eval_tree(self, grid, level=0):
+        if dead(grid):
+            return (1, 0)
+        if level = self.search_depth:
+            return (1, self.leaf_score(grid))
+        leaves = []
+        for move in move_list:
+            new_grid, score_incr, zeroes = move_result(grid, move)
+            for (p_branch, branch_grid) in grid_fanout(new_grid, zeroes):
+                for (p_leaf, leaf_score) in self.eval_tree(branch_grid, level + 1):
+                    leaves.append((p_branch * p_leaf, score_incr + leaf_score))
+        return leaves
+
 class Strategy(object):
     def registerPlayer(self, player):
         self.player = player
