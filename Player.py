@@ -14,7 +14,11 @@ class Player(object):
 	def play(self):
 		move = self.strategy.getMove(self._grid)
 		move.execute()
-		return self.check_state()
+                self.strategy.reportResults(self._grid, self._score)
+		return_value = self.check_state()
+		if return_value == False:
+			self.strategy.reportFinalResults(self._grid, self._score)
+		return return_value
 
 	def check_state(self):
 		if self._won:

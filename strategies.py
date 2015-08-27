@@ -4,6 +4,7 @@ import random
 
 import moves
 import math
+import copy
 import MySQLdb
 from Simulator import Simulator
 
@@ -11,6 +12,12 @@ from Simulator import Simulator
 class Strategy(object):
     def registerPlayer(self, player):
         self.player = player
+
+    def reportResults(self, new_grid, new_score):
+        pass
+
+    def reportFinalResults(self, new_grid, new_score):
+        pass
 
 class InteractiveStrategy(Strategy):
 
@@ -39,6 +46,7 @@ class InteractiveStrategy(Strategy):
                 cn.close()
 
     def getMove(self, grid):
+        self._old_grid = copy.deepcopy(grid)
         for row in grid:
 	    line = '|'
             for cell in row:
@@ -64,14 +72,21 @@ class InteractiveStrategy(Strategy):
                 move_value = 'right'
             else:
                 repeat = True
-        # Record the move in the database
+        
+        self._old_move = move_value
+        return return_value
+
+    def reportResults(self, new_grid, new_score):
+        if self._old_grid == new_grid:
+            return
+        
         # TODO: This hash function should be in a utility class somewhere.
-        hash = self._hash_grid(grid)
+        hash = self._hash_grid(self._old_grid)
         cn = None
         try:
             cn = MySQLdb.connect(host="127.0.0.1", user="root", passwd="", db="game")
             cr = cn.cursor()
-            cr.execute("INSERT INTO history (game_id, hash, move) VALUES (%s, %s, %s)", (self.id, hash, move_value))
+            cr.execute("INSERT INTO history (game_id, hash, move, score) VALUES (%s, %s, %s, %s)", (self.id, hash, self._old_move, new_score))
             cn.commit()
         except:
             if cn:
@@ -80,7 +95,23 @@ class InteractiveStrategy(Strategy):
         finally:
             if cn:
                 cn.close()
-        return return_value
+
+    def reportFinalResults(self, new_grid, new_score):
+        cn = None
+        try:
+             cn = MySQLdb.connect(host="127.0.0.1", user="root", passwd="", db="game")
+             cr = cn.cursor()
+             cr.execute("UPDATE games SET score=%s WHERE id = %s", (new_score, self.id))
+             cn.commit()
+        except:
+            if cn:
+                cn.rollback()
+            raise
+        finally:
+            if cn:
+                cn.close()
+
+
 
     def _hash_grid(self, grid):
         hash = 0
@@ -93,7 +124,6 @@ class InteractiveStrategy(Strategy):
                     log_value = int(math.log(value, 2))
                 mult = (y & 0b10) << 4 | (x & 0b10) << 3 | (y & 0b01) << 3 | (x & 0b01) << 2
                 hash |= log_value << mult
-        print hash
         return hash
 
 
