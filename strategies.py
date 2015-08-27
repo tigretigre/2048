@@ -3,12 +3,98 @@ __author__ = 'cardj'
 import random
 
 import moves
+import math
+import MySQLdb
 from Simulator import Simulator
 
 
 class Strategy(object):
     def registerPlayer(self, player):
         self.player = player
+
+class InteractiveStrategy(Strategy):
+
+    host = ''
+    user = ''
+    password = ''
+
+    def __init__(self, host, user, password):
+        self.host = host
+        self.user = user
+        self.password = password
+        cn = None
+        try:
+            cn = MySQLdb.connect(host=self.host, user=self.user, passwd=self.password, db="game")
+            cr = cn.cursor()
+            cr.execute("INSERT INTO games VALUES ();")
+            cr.execute("SELECT LAST_INSERT_ID();")
+            ((self.id,),) = cr.fetchall()
+            cn.commit()
+        except:
+            if cn:
+                cn.rollback()
+            raise
+        finally:
+            if cn:
+                cn.close()
+
+    def getMove(self, grid):
+        for row in grid:
+	    line = '|'
+            for cell in row:
+                line += "{:4d}|".format(cell)
+            print line
+        return_value = None
+        move_value = None
+        repeat = True
+        while(repeat):
+            move = raw_input("Move?")
+            repeat = False
+            if move == 'h':
+                return_value = moves.MoveLeft(self.player)
+                move_value = 'left'
+            elif move == 'j':
+                return_value = moves.MoveUp(self.player)
+                move_value = 'up'
+            elif move == 'k':
+                return_value = moves.MoveDown(self.player)
+                move_value = 'down'
+            elif move == 'l':
+                return_value = moves.MoveRight(self.player)
+                move_value = 'right'
+            else:
+                repeat = True
+        # Record the move in the database
+        # TODO: This hash function should be in a utility class somewhere.
+        hash = self._hash_grid(grid)
+        cn = None
+        try:
+            cn = MySQLdb.connect(host="127.0.0.1", user="root", passwd="", db="game")
+            cr = cn.cursor()
+            cr.execute("INSERT INTO history (game_id, hash, move) VALUES (%s, %s, %s)", (self.id, hash, move_value))
+            cn.commit()
+        except:
+            if cn:
+                cn.rollback()
+            raise
+        finally:
+            if cn:
+                cn.close()
+        return return_value
+
+    def _hash_grid(self, grid):
+        hash = 0
+        for y in range(0, len(grid)):
+            for x in range(0, len(grid[y])):
+                value = grid[y][x]
+                if value == 0:
+                    log_value = 0
+                else:
+                    log_value = int(math.log(value, 2))
+                mult = (y & 0b10) << 4 | (x & 0b10) << 3 | (y & 0b01) << 3 | (x & 0b01) << 2
+                hash |= log_value << mult
+        print hash
+        return hash
 
 
 class LowerRightStrategy(Strategy):
