@@ -1,11 +1,10 @@
 """
-This script sets up a game where the human user plays the game and it is recorded for an AI using the
-RubricStrategy to play in a similar fashion.
+This script runs an AI using the RubricStrategy based on past gameplay observed while running run.py.
 """
-
 from Player import Player
 import strategies
 import sys
+import time
 import random
 from Breeder import Breeder
 
@@ -16,10 +15,10 @@ player = Player()
 host = "127.0.0.1"
 user = "root"
 password = ""
-player.strategy = strategies.InteractiveStrategy(host, user, password)
+player.strategy = strategies.RubricStrategy(host, user, password)
 
 #skip = False
 # Loop
 while(player.play()):
-	pass
+	time.sleep(3)
 print "I guess it's over"

@@ -19,7 +19,13 @@ class Strategy(object):
     def reportFinalResults(self, new_grid, new_score):
         pass
 
+# TODO: Obviously, the connection management here is terrible.
 class InteractiveStrategy(Strategy):
+    """
+    This class provides a "strategy" in the sense that the player provides the strategy by
+    playing the game interactively. This is primarily used to create a history of "good"
+    gameplay for the computer to mimic.
+    """
 
     host = ''
     user = ''
@@ -103,6 +109,8 @@ class InteractiveStrategy(Strategy):
              cr = cn.cursor()
              cr.execute("UPDATE games SET score=%s WHERE id = %s", (new_score, self.id))
              cn.commit()
+
+             self.analyzeGame()
         except:
             if cn:
                 cn.rollback()
@@ -111,9 +119,23 @@ class InteractiveStrategy(Strategy):
             if cn:
                 cn.close()
 
-
+    def analyzeGame(self):
+        # This is eventually be more complex than this.
+        cn = MySQLdb.connect(host=self.host, user=self.user, passwd=self.password, db="game")
+        cr = cn.cursor()
+        cr.execute("INSERT INTO rubrics (hash, move) SELECT hash, move FROM history WHERE game_id = %s ON DUPLICATE KEY UPDATE move = VALUES(move)", (self.id,))
 
     def _hash_grid(self, grid):
+        """
+        This function is the key to this approach to the system. By employing a modified z-order hash
+        for a primary key in a table "rubrics", I can encode each configuration of the grid such that
+        grids with similar hashes are "substantially similar", similar enough that the moves used in
+        the nearby boards are probably good moves for the board the AI is facing currently.
+
+        Future improvements may be found in changing the ordering from z-order to a serpentine one
+        more consitent with the game's strategy. Abstracting this into a utility class would aid in
+        running comparative experiments with different hashing functions.
+        """
         hash = 0
         for y in range(0, len(grid)):
             for x in range(0, len(grid[y])):
@@ -126,6 +148,67 @@ class InteractiveStrategy(Strategy):
                 hash |= log_value << mult
         return hash
 
+# This inherits from RubricStrategy just to get the _hash_grid function. That should be 
+#   abstracted away into a utility class
+class RubricStrategy(InteractiveStrategy):
+    """
+    This strategy uses a modified z-order so be able to search for boards in its knowledge base that
+    are "substantially similar" to the board it is currently facing, allowing the computer to learn to
+    play through experience. It seems to me that this is a more reliable way for the computer to
+    understand the game the attempting to create a fitness function.
+
+    With suitable additions, this approach can lead to the computer self-learning by adjusting how the
+    rubrics are built through the method analyzeGame and how to weight nearby boards (how many of the
+    nearest boards to use, how to weight the results based on their distance from the current board,
+    etc.)
+    """
+
+    host = ''
+    user = ''
+    password = ''
+
+    def __init__(self, host, user, password):
+        self.host = host
+        self.user = user
+        self.password = password
+
+    def getMove(self, grid):
+        for row in grid:
+            line = '|'
+            for cell in row:
+                line += "{:4d}|".format(cell)
+            print line
+
+        hash = self._hash_grid(grid)
+
+        cn = MySQLdb.connect(host=self.host, user=self.user, passwd=self.password, db="game")
+        cr = cn.cursor()
+        cr.execute("SELECT move, COUNT(move) FROM (SELECT move, CASE WHEN hash > %(hash)s THEN hash - %(hash)s ELSE %(hash)s - hash END AS diff FROM rubrics ORDER BY diff ASC LIMIT 10) closest_moves GROUP BY move ORDER BY COUNT(move) DESC" % {"hash": hash })
+        move_counts = cr.fetchall()
+        move_list = []
+        for (move, count) in move_counts:
+            move_list += [move] * count
+        move_list += ['random']
+        move = random.choice(move_list)
+        print move
+        if move == 'random':
+            rand_moves = ['up', 'left', 'down', 'right']
+            move = random.choice(rand_moves)
+        if move == 'left':
+            return_value = moves.MoveLeft(self.player)
+        elif move == 'up':
+            return_value = moves.MoveUp(self.player)
+        elif move == 'down':
+            return_value = moves.MoveDown(self.player)
+        elif move == 'right':
+            return_value = moves.MoveRight(self.player)
+        return return_value
+
+    def reportResults(self, grid, score):
+        pass
+ 
+    def reportFinalResults(self, grid, score):
+        pass
 
 class LowerRightStrategy(Strategy):
 

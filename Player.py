@@ -22,7 +22,6 @@ class Player(object):
 
 	def check_state(self):
 		if self._won:
-			self._won()
 			return False
 		elif self._over:
 			return False
@@ -43,9 +42,6 @@ class Player(object):
 		self._won = data['won']
 		self._over = data['over']
 		self._score = data['score']
-
-	def _won(self):
-		print "Won!"
 
 	@property
 	def strategy(self):
