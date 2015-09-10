@@ -183,13 +183,15 @@ class RubricStrategy(InteractiveStrategy):
 
         cn = MySQLdb.connect(host=self.host, user=self.user, passwd=self.password, db="game")
         cr = cn.cursor()
-        cr.execute("SELECT move, COUNT(move) FROM (SELECT move, CASE WHEN hash > %(hash)s THEN hash - %(hash)s ELSE %(hash)s - hash END AS diff FROM rubrics ORDER BY diff ASC LIMIT 10) closest_moves GROUP BY move ORDER BY COUNT(move) DESC" % {"hash": hash })
+        cr.execute("SELECT move, COUNT(move), SUM(diff)/COUNT(move) AS avg_diff FROM (SELECT move, CASE WHEN hash > %(hash)s THEN hash - %(hash)s ELSE %(hash)s - hash END AS diff FROM rubrics ORDER BY diff ASC LIMIT 10) closest_moves GROUP BY move ORDER BY avg_diff ASC" % {"hash": hash })
         move_counts = cr.fetchall()
+	print move_counts
         move_list = []
-        for (move, count) in move_counts:
-            move_list += [move] * count
-        move_list += ['random']
-        move = random.choice(move_list)
+        #for (move, count, diffs) in move_counts:
+        #    move_list += [move] * count
+        #move_list += ['random']
+        #move = random.choice(move_list)
+	move = move_counts[0][0]
         print move
         if move == 'random':
             rand_moves = ['up', 'left', 'down', 'right']
