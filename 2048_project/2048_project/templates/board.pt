@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+  <head>
+    <title>2048 Playing AI!</title>
+    <meta name="author" content="Jonathan Card">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${request.static_url('2048_project:static/2048.css')}" rel="stylesheet">
+    <script type="text/javascript">
+      grid = ${grid};
+    </script>
+  </head>
+  <body ng-app="2048">
+    <div class="container" ng-controller="board">
+      <div id="row-0" class="row">
+        <div id="cell-0-0" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-0-1" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-0-2" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-0-3" class="cell col-md-3"><div class="placeholder"></div></div>
+      </div>
+      <div id="row-1" class="row">
+        <div id="cell-1-0" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-1-1" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-1-2" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-1-3" class="cell col-md-3"><div class="placeholder"></div></div>
+      </div>
+      <div id="row-2" class="row">
+        <div id="cell-2-0" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-2-1" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-2-2" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-2-3" class="cell col-md-3"><div class="placeholder"></div></div>
+      </div>
+      <div id="row-3" class="row">
+        <div id="cell-3-0" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-3-1" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-3-2" class="cell col-md-3"><div class="placeholder"></div></div>
+        <div id="cell-3-3" class="cell col-md-3"><div class="placeholder"></div></div>
+      </div>
+      <div ng-repeat="tile in tiles | filter:{'visible': true}" style="left: {{15 + tile.x * (213 + 30)}}px; top: {{15 + tile.y * (212 + 30)}}px" class="tile value-{{tile.value}}">{{tile.value}}</div>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-animate.min.js"></script>
+    <script src="${request.static_url('2048_project:static/2048.js')}"></script>
+  </body>
+</html>

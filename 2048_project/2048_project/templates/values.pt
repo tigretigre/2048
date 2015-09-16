@@ -1,0 +1,5 @@
+{
+    "move": "${move}",
+    "grid": ${grid},
+    "visible": true
+}

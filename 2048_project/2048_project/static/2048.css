@@ -1,0 +1,93 @@
+div.container {
+  background-color: beige;
+  position: relative;
+}
+
+div.row {
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
+
+div.cell {
+  height: 212px;
+}
+
+div.placeholder {
+  background-color: white;
+  border-radius: 5px;
+  height: 100%;
+}
+
+div.tile {
+  height: 212px;
+  width: 212px;
+  position: absolute;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  padding-top: 60px;
+  font-size:36pt;
+}
+
+/* Animation */
+.tile.ng-enter,
+.tile.ng-leave
+{
+  -webkit-transition: 400ms linear all;
+  -moz-transition: 400ms linear all;
+  -ms-transition: 400ms linear all;
+  -o-transition: 400ms linear all;
+  transition: 400ms linear all;
+}
+
+.tile.ng-enter.ng-enter-active,
+.tile.ng-leave {
+  opacity: 1;
+}
+
+.tile.ng-leave.ng-leave-active,
+.tile.ng-enter {
+  opacity: 0;
+}
+
+/* Tile values */
+
+div.tile.value-2 {
+  background-color: gray;
+}
+
+div.tile.value-4 {
+  background-color: beige;
+}
+
+div.tile.value-8 {
+  background-color: orange;
+}
+
+div.tile.value-16 {
+  background-color: red;
+}
+
+div.tile.value-32 {
+  background-color: pink;
+}
+
+div.tile.value-64 {
+  background-color: red;
+}
+
+div.tile.value-128 {
+  background-color: GoldenRod;
+}
+
+div.tile.value-248 {
+  background-color: yellow;
+}
+
+div.tile.value-512 {
+  background-color: yellow;
+}
+
+div.tile.value-1024 {
+  background-color: yellow;
+}
